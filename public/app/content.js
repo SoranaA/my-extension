@@ -2,11 +2,21 @@
 
 //content script
 var clickedElement;
+var element;
 
 document.addEventListener(
   "mousedown",
   function (event) {
     clickedElement = event.target;
+  },
+  true
+);
+
+document.addEventListener(
+  "mouseover",
+  function (event) {
+    element = event.target;
+    console.log(element.innerText);
   },
   true
 );
