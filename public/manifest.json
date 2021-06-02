@@ -2,11 +2,10 @@
   "manifest_version": 2,
   "name": "Filterest",
   "description": "This extension will allow you to filter the content of the web pages based on your interests",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Sorana",
   "browser_action": {
-    "default_popup": "index.html",
-    "default_title": "Open the popup"
+    "default_title": "Filterest"
   },
   "icons": {
     "16": "logo/logo16.png",
@@ -25,6 +24,6 @@
       "all_frames": false
     }
   ],
-  "permissions": ["http://*/*", "https://*/*", "contextMenus"],
+  "permissions": ["tabs", "http://*/*", "https://*/*", "contextMenus"],
   "content_security_policy": "script-src 'self' 'sha256-ELkDE2InNI702G86lymxXYBdrcJq5bMn8+PhTgN6cks='; object-src 'self'"
 }
