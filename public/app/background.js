@@ -54,6 +54,7 @@ chrome.browserAction.onClicked.addListener(function () {
     chrome.tabs.sendMessage(tab.id, { action: "toggle" }, function (response) {
       if (chrome.runtime.lastError) {
         // lastError needs to be checked, otherwise Chrome may throw an error
+        return;
       }
 
       if (!response) {
@@ -65,4 +66,13 @@ chrome.browserAction.onClicked.addListener(function () {
   });
 });
 
+chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
+  if (msg.action === 'status' && msg.active === true) {
+    setActive();
+  } else if (msg.action === 'status' && msg.active === false) {
+    setInactive();
+  }
+});
+
 checkActive();
+

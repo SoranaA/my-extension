@@ -51,16 +51,36 @@ const filterest = {
     }
   },
 
+  hideTarget: function (e) {
+    console.log(filterest.elementHighlighted);
+
+    filterest.elementHighlighted.style.display = "none";
+  },
+
+  preventDefaultEvent: function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  },
+
   activate: function () {
     filterest.isActive = true;
+
     document.addEventListener("mouseover", filterest.mouseover, true);
+    document.addEventListener('mousedown', filterest.hideTarget, true);
+    document.addEventListener('mouseup', filterest.preventDefaultEvent, true);
+    document.addEventListener('click', filterest.preventDefaultEvent, true);
 
     chrome.extension.sendMessage({ action: "status", active: true });
   },
 
   deactivate: function () {
     filterest.isActive = false;
+
     document.removeEventListener("mouseover", filterest.mouseover, true);
+    document.removeEventListener('mousedown', filterest.hideTarget, true);
+    document.removeEventListener('mouseup', filterest.preventDefaultEvent, true);
+    document.removeEventListener('click', filterest.preventDefaultEvent, true);
 
     if (filterest.elementHighlighted) {
       filterest.removeHighlight();
