@@ -1,0 +1,37 @@
+.filterest-hidden {
+  display: none !important;
+}
+
+#filterest_help_window {
+  position: fixed;
+  bottom: 0;
+  right: 10px;
+  width: 360px;
+  padding: 10px 20px;
+  box-sizing: content-box;
+  text-align: left;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #fff;
+  box-shadow: 0px 0px 40px rgb(0 0 0 / 15%);
+  z-index: 2147483647;
+  font-size: 12px;
+  color: #666;
+}
+
+#filterest_help_window.minimized {
+  width: 80px;
+  height: 12px;
+}
+
+#filterest_help_window.minimized > * {
+  display: none;
+}
+
+#minimize {
+  display: block;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  text-align: center;
+}
