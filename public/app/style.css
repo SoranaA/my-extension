@@ -23,7 +23,7 @@
   height: 12px;
 }
 
-#filterest_help_window.minimized > * {
+#filterest_help_window.minimized #elements_list {
   display: none;
 }
 

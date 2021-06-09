@@ -16,6 +16,25 @@ const filterest = {
     return false;
   },
 
+  getSelector: function (element) {
+    if (element.tagName === 'BODY') return 'body';
+    if (element.tagName === 'HTML') return 'html';
+    if (!element) return null;
+
+    // https://stackoverflow.com/a/42184417
+    var str = element.tagName;
+    str += (element.id !== "") ? "#" + element.id : "";
+
+    if (element.className) {
+      var classes = element.className.split(/\s/);
+      for (var i = 0; i < classes.length; i++) {
+        str += "." + classes[i]
+      }
+    }
+
+    return filterest.getSelector(element.parentNode) + " > " + str;
+  },
+
   ignoreElement: function (e) {
     return e.tagName === "BODY"
       || e.tagName === "HTML"
@@ -55,6 +74,8 @@ const filterest = {
   hideElement: function (e) {
     if (filterest.ignoreElement(filterest.elementHovered)) return;
 
+    console.log(filterest.getSelector(filterest.elementHovered));
+
     filterest.elementHighlighted.classList.add('filterest-hidden');
     filterest.hiddenElements.push(filterest.elementHighlighted);
 
@@ -62,6 +83,8 @@ const filterest = {
   },
 
   preventDefaultEvent: function (e) {
+    if (filterest.isChildOfHelpWindow(e.target)) return;
+
     e.preventDefault();
     e.stopPropagation();
     return false;
@@ -89,7 +112,7 @@ const filterest = {
         elementsHtml.push(`<tr>
           <td>${filterest.getElementDisplayForTable(element)}</td>
           <td><input type="checkbox"></td>
-          <td><button>Restore</button></td>
+          <td><button id="${filterest.getSelector(element)}" class="filterest_restore">Restore</button></td>
         </tr>`)
       });
 
@@ -97,6 +120,33 @@ const filterest = {
     }
 
     elemList.innerHTML = elementsHtml.join('\n');
+
+    let i = -1;
+    for (let tr of document.querySelectorAll('#elements_list table tr')) {
+      if (i < 0) { // skip heading
+        i++;
+        continue;
+      }
+
+      function onRestoreElement(e) {
+        let index = filterest.hiddenElements.findIndex(element => filterest.getSelector(element) === e.target.id);
+
+        if (index > -1) {
+          filterest.hiddenElements[index].classList.remove('filterest-hidden');
+          filterest.hiddenElements.splice(index, 1);
+        }
+
+        filterest.updateElementsList();
+
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      tr.querySelector('.filterest_restore').addEventListener('click', onRestoreElement, false);
+
+      i++;
+    }
+
   },
 
   activate: function () {
@@ -106,15 +156,12 @@ const filterest = {
     div.setAttribute('id', 'filterest_help_window');
 
     div.innerHTML = `
-    <div id='filterest_help_window'>
       <h3>Filterest</h3>
       <button id="minimize">_</button>
       <div id="elements_list"></div>
-    </div>
     `;
 
     div.querySelector('#minimize').addEventListener('click', function (e) {
-      console.log("minimize clicked");
       div.classList.toggle('minimized');
       e.preventDefault();
     });
