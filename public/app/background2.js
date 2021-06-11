@@ -67,7 +67,7 @@ chrome.browserAction.onClicked.addListener(function () {
 
           if (!response) {
             chrome.tabs.executeScript(tab.id, {
-              code: "if (confirm('This tab was loaded before CTRE was installed. Would you like to reload it?\\nThis is necessary only the first time.')) location.reload();",
+              code: "if (confirm('This tab was loaded before Filterest was installed and you should reload it to be able to use the extension.\\nThis is necessary only the first time.')) location.reload();",
             });
           }
         }
@@ -83,9 +83,9 @@ chrome.extension.onMessage.addListener(function (msg, sender, sendResponse) {
     setInactive();
   }
 
-  if (msg.action === "get_saved_elms") {
+  if (msg.action === "get_saved_elments") {
     sendResponse(localStorage["web:" + msg.website] || "[]");
-  } else if (msg.action === "set_saved_elms") {
+  } else if (msg.action === "set_saved_elements") {
     localStorage["web:" + msg.website] = msg.data;
   }
 });

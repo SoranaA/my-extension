@@ -13,31 +13,18 @@
     "128": "logo/logo128.png"
   },
   "background": {
-    "scripts": [
-      "app/background.js"
-    ],
+    "scripts": ["app/background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
-      "matches": [
-        "*://*/*"
-      ],
-      "js": [
-        "app/content.js"
-      ],
-      "css": [
-        "app/style.css"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["app/content.js"],
+      "css": ["app/style.css"],
       "run_at": "document_end",
       "all_frames": false
     }
   ],
-  "permissions": [
-    "tabs",
-    "http://*/*",
-    "https://*/*",
-    "contextMenus"
-  ],
+  "permissions": ["tabs", "http://*/*", "https://*/*"],
   "content_security_policy": "script-src 'self' 'sha256-ELkDE2InNI702G86lymxXYBdrcJq5bMn8+PhTgN6cks='; object-src 'self'"
 }
