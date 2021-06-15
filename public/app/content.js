@@ -6,8 +6,51 @@ const filterest = {
   markedElement: false,
   isActive: false,
   hiddenElements: [],
-
   helpWindow: false,
+
+  isChildOfHelpWindow: function (e) {
+    while (e) {
+      if (e === filterest.helpWindow) return true;
+      return filterest.isChildOfHelpWindow(e.parentNode);
+    }
+
+    return false;
+  },
+
+  ignoreElement: function (e) {
+    return (
+      e.tagName === "BODY" ||
+      e.tagName === "HTML" ||
+      filterest.isChildOfHelpWindow(e)
+    );
+  },
+
+  getSelector: function (element) {
+    if (element.tagName === "BODY") return "body";
+    if (element.tagName === "HTML") return "html";
+    if (!element) return null;
+
+    // https://stackoverflow.com/a/42184417
+    var str = element.tagName;
+    str += element.id !== "" ? "#" + element.id : "";
+
+    if (element.className) {
+      var classes = element.className.split(/\s/);
+      for (var i = 0; i < classes.length; i++) {
+        str += "." + classes[i];
+      }
+    }
+
+    return filterest.getSelector(element.parentNode) + " > " + str;
+  },
+
+  preventEvent: function (e) {
+    if (filterest.ignoreElement(e.target)) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  },
 
   highlightElement: function () {
     if (!filterest.hoveredElement) return;
@@ -39,23 +82,6 @@ const filterest = {
     }
   },
 
-  isChildOfHelpWindow: function (e) {
-    while (e) {
-      if (e === filterest.helpWindow) return true;
-      return filterest.isChildOfHelpWindow(e.parentNode);
-    }
-
-    return false;
-  },
-
-  ignoreElement: function (e) {
-    return (
-      e.tagName === "BODY" ||
-      e.tagName === "HTML" ||
-      filterest.isChildOfHelpWindow(e)
-    );
-  },
-
   hideTarget: function (e) {
     if (filterest.ignoreElement(e.target)) return;
 
@@ -71,33 +97,6 @@ const filterest = {
     filterest.updateCSS();
     filterest.updateElementList();
     filterest.updateSavedElements();
-
-    e.preventDefault();
-    e.stopPropagation();
-    return false;
-  },
-
-  getSelector: function (element) {
-    if (element.tagName === "BODY") return "body";
-    if (element.tagName === "HTML") return "html";
-    if (!element) return null;
-
-    // https://stackoverflow.com/a/42184417
-    var str = element.tagName;
-    str += element.id !== "" ? "#" + element.id : "";
-
-    if (element.className) {
-      var classes = element.className.split(/\s/);
-      for (var i = 0; i < classes.length; i++) {
-        str += "." + classes[i];
-      }
-    }
-
-    return filterest.getSelector(element.parentNode) + " > " + str;
-  },
-
-  preventEvent: function (e) {
-    if (filterest.ignoreElement(e.target)) return;
 
     e.preventDefault();
     e.stopPropagation();

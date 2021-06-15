@@ -13,13 +13,13 @@
     "128": "logo/logo128.png"
   },
   "background": {
-    "scripts": ["app/background.js"],
+    "scripts": ["app/background2.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["app/content.js"],
+      "js": ["app/content2.js"],
       "css": ["app/style.css"],
       "run_at": "document_end",
       "all_frames": false
