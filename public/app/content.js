@@ -22,18 +22,15 @@ const filterest = {
     if (element.tagName === "HTML") return "html";
     if (!element) return null;
 
-    // https://stackoverflow.com/a/42184417
-    var str = element.tagName;
-    str += element.id !== "" ? "#" + element.id : "";
-
-    if (element.className) {
-      var classes = element.className.split(/\s/);
-      for (var i = 0; i < classes.length; i++) {
-        str += "." + classes[i];
-      }
+    // https://stackoverflow.com/a/49663134
+    let path = [], parent;
+    
+    while (parent = element.parentNode) {
+      path.unshift(`${element.tagName}:nth-child(${[].indexOf.call(parent.children, element)+1})`);
+      element = parent;
     }
 
-    return filterest.getSelector(element.parentNode) + " > " + str;
+    return `${path.join(' > ')}`.toLowerCase();
   },
 
   ignoreElement: function (e) {
