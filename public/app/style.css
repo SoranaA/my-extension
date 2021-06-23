@@ -20,7 +20,7 @@
 
 #filterest_help_window.minimized {
   width: 80px;
-  height: 12px;
+  height: 18px;
 }
 
 #filterest_help_window.minimized #elements_list {
@@ -31,7 +31,65 @@
   display: block;
   cursor: pointer;
   position: absolute;
-  top: 20px;
+  top: 10px;
   right: 10px;
   text-align: center;
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+}
+
+.filterest_restore {
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 8px;
+}
+
+/*==================================================================
+[ Ver1 ]*/
+
+.table100.ver1 th {
+  font-family: Lato-Bold;
+  font-size: 14px;
+  color: #fff;
+  line-height: 1.2;
+  background-color: #6c7ae0;
+}
+
+.table100.ver1 td {
+  font-family: Lato-Regular;
+  font-size: 12px;
+  color: #808080;
+  line-height: 1.2;
+}
+
+.table100.ver1 .table100-body tr:nth-child(even) {
+  background-color: #f8f6ff;
+}
+
+/*---------------------------------------------*/
+
+.table100.ver1 {
+  border-radius: 10px;
+  overflow-y: scroll;
+  max-height: 200px;
+  box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+}
+
+.table100.ver1 .ps__rail-y {
+  right: 5px;
+}
+
+.table100.ver1 .ps__rail-y::before {
+  background-color: #ebebeb;
+}
+
+.table100.ver1 .ps__rail-y .ps__thumb-y::before {
+  background-color: #cccccc;
 }

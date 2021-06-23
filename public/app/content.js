@@ -122,8 +122,9 @@ const filterest = {
             id="${filterest.getSelector(element)}"
             ${element.rememberHide ? " checked" : ""}></td>
           <td><button 
+            title="Restore"
             id="${filterest.getSelector(element)}"
-            class="filterest_restore">Restore</button></td>
+            class="filterest_restore">↺</button></td>
         </tr>`);
       });
 
@@ -240,12 +241,20 @@ const filterest = {
 
     div.innerHTML = `
       <h3>Filterest</h3>
-      <button id="minimize">_</button>
-      <div id="elements_list"></div>
+      <button id="minimize">↘</button>
+      <div id="elements_list" class="table100 ver1"></div>
     `;
 
     div.querySelector("#minimize").addEventListener("click", function (e) {
       div.classList.toggle("minimized");
+      console.log(this.innerHTML);
+      
+      if (this.innerHTML === '↘') {
+        this.innerHTML = '↖';
+      } else {
+        this.innerHTML = '↘';
+      }
+
       e.preventDefault();
     });
 
