@@ -7,6 +7,7 @@
   bottom: 0;
   right: 10px;
   width: 360px;
+  min-height: 210px;
   padding: 10px 20px;
   box-sizing: content-box;
   text-align: left;
@@ -21,9 +22,14 @@
 #filterest_help_window.minimized {
   width: 80px;
   height: 18px;
+  min-height: 18px;
 }
 
 #filterest_help_window.minimized #elements_list {
+  display: none;
+}
+
+#filterest_help_window.minimized #hideSimilarElements {
   display: none;
 }
 
@@ -47,8 +53,15 @@
   border-radius: 8px;
 }
 
+#hideSimilarElements {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+}
+
 /*==================================================================
-[ Ver1 ]*/
+Elements Table
+*/
 
 .table100.ver1 th {
   font-family: Lato-Bold;
@@ -74,7 +87,7 @@
 .table100.ver1 {
   border-radius: 10px;
   overflow-y: scroll;
-  max-height: 200px;
+  max-height: 150px;
   box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);

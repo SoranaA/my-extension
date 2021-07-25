@@ -243,19 +243,40 @@ const filterest = {
       <h3>Filterest</h3>
       <button id="minimize">↘</button>
       <div id="elements_list" class="table100 ver1"></div>
+      <br/>
+      <div>
+        <button id="hideSimilarElements">Hide similar elements</button>
+      </div>
     `;
 
     div.querySelector("#minimize").addEventListener("click", function (e) {
+      e.preventDefault();
+
       div.classList.toggle("minimized");
-      console.log(this.innerHTML);
       
       if (this.innerHTML === '↘') {
         this.innerHTML = '↖';
       } else {
         this.innerHTML = '↘';
       }
+    });
 
+    div.querySelector('#hideSimilarElements').addEventListener("click", function (e) {
       e.preventDefault();
+
+      let allHiddenText = "";
+      filterest.hiddenElements.forEach(element => {
+        allHiddenText += element.innerText;
+        allHiddenText += " ";
+      });
+
+      console.log(allHiddenText);
+
+      fetch("https://localhost:44340/keywordfinder/" + allHiddenText)
+        .then((res) => res.json())
+        .then(
+          (result) => { console.log(result) },
+          (error) => { console.log(error) })
     });
 
     document.body.appendChild(div);
