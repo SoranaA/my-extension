@@ -233,6 +233,36 @@ const filterest = {
     });
   },
 
+  getKeywords: async function () {
+    let allHiddenText = "";
+    filterest.hiddenElements.forEach(element => {
+      allHiddenText += element.innerText;
+      allHiddenText += " ";
+    });
+
+    allHiddenText = allHiddenText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim();
+    console.log(allHiddenText);
+
+    // fetch("https://localhost:44340/keywordfinder/" + allHiddenText)
+    //   .then((res) => console.log(res))
+      // .then(
+      //   (result) => { console.log(result) },
+      //   (error) => { console.log(error) })
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 
+        'Accept': 'application/json',
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({ text: 'React POST Request React Example React' })
+    };
+    
+    fetch("https://localhost:44340/keywordfinder", requestOptions)
+        .then(response => console.log(response))
+        //.then(data => this.setState({ postId: data.id }));
+  },
+
   activate: function () {
     filterest.isActive = true;
 
@@ -261,22 +291,10 @@ const filterest = {
       }
     });
 
-    div.querySelector('#hideSimilarElements').addEventListener("click", function (e) {
+    div.querySelector('#hideSimilarElements').addEventListener("click", async function (e) {
       e.preventDefault();
 
-      let allHiddenText = "";
-      filterest.hiddenElements.forEach(element => {
-        allHiddenText += element.innerText;
-        allHiddenText += " ";
-      });
-
-      console.log(allHiddenText);
-
-      fetch("https://localhost:44340/keywordfinder/" + allHiddenText)
-        .then((res) => res.json())
-        .then(
-          (result) => { console.log(result) },
-          (error) => { console.log(error) })
+      await filterest.getKeywords();
     });
 
     document.body.appendChild(div);

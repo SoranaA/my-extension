@@ -17,17 +17,17 @@ namespace backend_text_similarities.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{text}")]
-        public ActionResult<IEnumerable<string>> GetKeywords(string text)
+        [HttpPost]
+        public IEnumerable<string> GetKeywords(TextToParse text)
         {
             var keywords = new List<string>();
 
-            if(string.IsNullOrEmpty(text))
+            if(string.IsNullOrEmpty(text.Text))
             {
                 return keywords;
             }
 
-            var keywordsObjects = KeywordAnalyzer.Analyze(text).Keywords;
+            var keywordsObjects = KeywordAnalyzer.Analyze(text.Text).Keywords;
 
             foreach (var kw in keywordsObjects)
             {
