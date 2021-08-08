@@ -6,6 +6,7 @@ const filterest = {
   elementHighlighted: false,
   isActive: false,
   hiddenElements: [],
+  keywords: [],
   helpWindow: false,
 
   isChildOfHelpWindow: function (e) {
@@ -79,8 +80,6 @@ const filterest = {
     );
 
     filterest.elementHighlighted.classList.add("filterest-hidden");
-
-    console.log(filterest.elementHighlighted.tagName);
     filterest.hiddenElements.push(filterest.elementHighlighted);
 
     filterest.updateElementsList();
@@ -102,6 +101,66 @@ const filterest = {
       return e.innerText;
     }
     return e;
+  },
+
+  displayKeywords: function () {
+    if (!filterest.helpWindow) return;
+
+    let elemList = document.querySelector("#elements_list");
+    let keywordsHtml = [];
+
+    if(filterest.keywords.length) {
+      keywordsHtml.push(
+        `<table><tr><th>Keyword</th><th></th></tr>`
+      );
+
+      filterest.keywords.forEach((keyword) => {
+        keywordsHtml.push(`<tr>
+        <td>${keyword}</td>
+        <td align="right"><button 
+          title="Remove"
+          id="removeKeyword_${keyword}"
+          class="filterest_removeKeyword">x</button></td>
+      </tr>`)
+      });
+
+      keywordsHtml.push("</table>");
+    }
+
+    elemList.innerHTML = keywordsHtml.join("\n");
+
+    let i = -1;
+    for (let tr of document.querySelectorAll("#elements_list table tr")) {
+      if (i < 0) {
+        // skip heading
+        i++;
+        continue;
+      }
+
+      function onDeleteKeyword(e) {
+        const keyword = e.target.id.split("_")[1];
+        let index = filterest.keywords.findIndex(
+          (element) => element === keyword
+        );
+
+        if (index > -1) {
+          filterest.keywords.splice(index, 1);
+        }
+
+        filterest.displayKeywords();
+
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      tr.querySelector(".filterest_removeKeyword").addEventListener(
+        "click",
+        onDeleteKeyword,
+        false
+      );
+
+      i++;
+    }
   },
 
   updateElementsList: function () {
@@ -223,9 +282,6 @@ const filterest = {
       elementsAsJson.push(data);
     });
 
-    console.log(elementsToRemember);
-    console.log(elementsAsJson);
-
     chrome.extension.sendMessage({
       action: "set_saved_elements",
       website: location.hostname.replace(/^www\./, ""),
@@ -241,26 +297,22 @@ const filterest = {
     });
 
     allHiddenText = allHiddenText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim();
-    console.log(allHiddenText);
-
-    // fetch("https://localhost:44340/keywordfinder/" + allHiddenText)
-    //   .then((res) => console.log(res))
-      // .then(
-      //   (result) => { console.log(result) },
-      //   (error) => { console.log(error) })
 
     const requestOptions = {
       method: 'POST',
       headers: { 
         'Accept': 'application/json',
-        'Content-Type': 'application/json' 
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: 'React POST Request React Example React' })
+      body: JSON.stringify({ text: allHiddenText })
     };
     
     fetch("https://localhost:44340/keywordfinder", requestOptions)
-        .then(response => console.log(response))
-        //.then(data => this.setState({ postId: data.id }));
+        .then(response => response.json())
+        .then(data => {
+          filterest.keywords = data;
+          filterest.displayKeywords()
+        });
   },
 
   activate: function () {

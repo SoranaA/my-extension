@@ -1,14 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace backend_text_similarities.Helpers
 {
     public class KeywordAnalyzer
     {
+        private static readonly string[] ignoredCharacters = new string[] 
+        { 
+            ",", ".", "?", "!", ";", ":", "'", "\"", "(", ")", "[", "]", "-" 
+        };
+
         public static KeywordAnalysis Analyze(string content)
         {
+            foreach (var c in ignoredCharacters)
+            {
+                content = content.Replace(c, string.Empty);
+            }
+
             KeywordAnalysis analysis = new KeywordAnalysis { Content = content };
             int wordCount = 0;
 
@@ -36,7 +43,7 @@ namespace backend_text_similarities.Helpers
 
             foreach (var word in wordDictionary)
             {
-                if(word.Value >= 3)
+                if (word.Value >= 3)
                 {
                     keywords.Add(new Keyword
                     {
@@ -51,5 +58,5 @@ namespace backend_text_similarities.Helpers
 
             return analysis;
         }
-	}
+    }
 }
