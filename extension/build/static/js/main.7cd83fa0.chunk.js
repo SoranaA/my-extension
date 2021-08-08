@@ -1,0 +1,2 @@
+(this["webpackJsonpmy-extension"]=this["webpackJsonpmy-extension"]||[]).push([[0],{4:function(e,t,n){"use strict";n.r(t);var s=n(0),o=n.n(s),c=n(2),i=n.n(c),r=n(3);i.a.render(Object(r.jsx)(o.a.StrictMode,{}),document.getElementById("root"))}},[[4,1,2]]]);
+//# sourceMappingURL=main.7cd83fa0.chunk.js.map

@@ -116,7 +116,7 @@ const filterest = {
 
       filterest.keywords.forEach((keyword) => {
         keywordsHtml.push(`<tr>
-        <td>${keyword}</td>
+        <td><input type="text" id="keyword_${keyword}" name="keywordInput" value="${keyword}"></td>
         <td align="right"><button 
           title="Remove"
           id="removeKeyword_${keyword}"
@@ -290,29 +290,53 @@ const filterest = {
   },
 
   getKeywords: async function () {
-    let allHiddenText = "";
-    filterest.hiddenElements.forEach(element => {
-      allHiddenText += element.innerText;
-      allHiddenText += " ";
-    });
+    console.log(filterest.keywords);
 
-    allHiddenText = allHiddenText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim();
+    if(filterest.keywords.length < 1) {
+      let allHiddenText = "";
+      filterest.hiddenElements.forEach(element => {
+        allHiddenText += element.innerText;
+        allHiddenText += " ";
+      });
 
-    const requestOptions = {
-      method: 'POST',
-      headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: allHiddenText })
-    };
-    
-    fetch("https://localhost:44340/keywordfinder", requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          filterest.keywords = data;
-          filterest.displayKeywords()
-        });
+      allHiddenText = allHiddenText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim();
+
+      const requestOptions = {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: allHiddenText })
+      };
+      
+      fetch("https://localhost:44340/keywordfinder", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            filterest.keywords = data;
+            filterest.displayKeywords();
+          });
+    }
+
+    filterest.displayKeywords();
+},
+
+  updateKeywords: function () {
+    let currentKeywords = [];
+
+    let i = -1;
+    for (let tr of document.querySelectorAll("#elements_list table tr")) {
+      if (i < 0) {
+        // skip heading
+        i++;
+        continue;
+      }
+
+      currentKeywords.push(tr.querySelector("input").value);
+      i++;
+    }
+
+    filterest.keywords = currentKeywords;
   },
 
   activate: function () {
@@ -328,6 +352,7 @@ const filterest = {
       <br/>
       <div>
         <button id="hideSimilarElements">Hide similar elements</button>
+        <button id="confirmKeywords" class="filterest-hidden">Confirm keywords</button>
       </div>
     `;
 
@@ -347,6 +372,23 @@ const filterest = {
       e.preventDefault();
 
       await filterest.getKeywords();
+
+      let hideButton = document.querySelector("#hideSimilarElements");
+      hideButton.classList.add("filterest-hidden");
+      let confirmButton = document.querySelector("#confirmKeywords");
+      confirmButton.classList.remove("filterest-hidden");
+    });
+
+    div.querySelector('#confirmKeywords').addEventListener("click", async function (e) {
+      e.preventDefault();
+
+      await filterest.updateKeywords();
+      filterest.updateElementsList();
+
+      let hideButton = document.querySelector("#hideSimilarElements");
+      hideButton.classList.remove("filterest-hidden");
+      let confirmButton = document.querySelector("#confirmKeywords");
+      confirmButton.classList.add("filterest-hidden");
     });
 
     document.body.appendChild(div);
