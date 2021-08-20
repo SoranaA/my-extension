@@ -383,12 +383,50 @@ const filterest = {
       e.preventDefault();
 
       await filterest.updateKeywords();
-      filterest.updateElementsList();
 
-      let hideButton = document.querySelector("#hideSimilarElements");
-      hideButton.classList.remove("filterest-hidden");
-      let confirmButton = document.querySelector("#confirmKeywords");
-      confirmButton.classList.add("filterest-hidden");
+      const parentNodesToCheck = [];
+
+      filterest.hiddenElements.forEach(element => {
+        if (!parentNodesToCheck.find(elem => filterest.getSelector(element.parentNode) === filterest.getSelector(elem))) {
+          parentNodesToCheck.push(element.parentNode);
+        }
+      });
+
+      let searchParents = true;
+      while(searchParents) {
+        let elementsWithOneChild = parentNodesToCheck.filter(element => element.children.length <= 1);
+        
+        if(elementsWithOneChild.length > 0) {
+          elementsWithOneChild.forEach(e => {
+            let index = parentNodesToCheck.findIndex(
+              (element) => filterest.getSelector(element) === filterest.getSelector(e)
+            );
+    
+            parentNodesToCheck.splice(index, 1);
+            if (!parentNodesToCheck.find(elem => filterest.getSelector(e.parentNode) === filterest.getSelector(elem))) {
+              parentNodesToCheck.push(e.parentNode);
+            }
+          })
+        } else {
+          searchParents = false;
+        }
+      }
+
+      parentNodesToCheck.forEach(e => {
+        const childs = [].slice.call(e.children);
+        childs.forEach(child => {
+          child.classList.add('filterest-background');
+        });
+        //e.classList.add('filterest-background');
+        //console.log(e.children);
+      })
+
+      // filterest.updateElementsList();
+
+      // let hideButton = document.querySelector("#hideSimilarElements");
+      // hideButton.classList.remove("filterest-hidden");
+      // let confirmButton = document.querySelector("#confirmKeywords");
+      // confirmButton.classList.add("filterest-hidden");
     });
 
     document.body.appendChild(div);
