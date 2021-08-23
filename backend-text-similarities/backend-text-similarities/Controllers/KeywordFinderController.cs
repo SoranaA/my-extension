@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace backend_text_similarities.Controllers
 {
@@ -22,7 +21,7 @@ namespace backend_text_similarities.Controllers
         {
             var keywords = new List<string>();
 
-            if(string.IsNullOrEmpty(text.Text))
+            if (string.IsNullOrEmpty(text.Text))
             {
                 return keywords;
             }
@@ -35,6 +34,32 @@ namespace backend_text_similarities.Controllers
             }
 
             return keywords;
+        }
+
+        [HttpPost("similarElements")]
+        public List<string> GetSimilarElementsByKeywords(SimilarElementsSearch elementsList)
+        {
+            var selectors = new List<string>();
+
+            foreach (var element in elementsList.Elements)
+            {
+                var keywordsContained = 0;
+
+                foreach (var keyword in elementsList.Keywords)
+                {
+                    if (element.InnerText.Contains(keyword))
+                    {
+                        keywordsContained++;
+                    }
+                }
+
+                if (keywordsContained > 2)
+                {
+                    selectors.Add(element.Selector);
+                }
+            }
+
+            return selectors;
         }
     }
 }

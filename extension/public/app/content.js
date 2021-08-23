@@ -290,8 +290,6 @@ const filterest = {
   },
 
   getKeywords: async function () {
-    console.log(filterest.keywords);
-
     if(filterest.keywords.length < 1) {
       let allHiddenText = "";
       filterest.hiddenElements.forEach(element => {
@@ -412,21 +410,38 @@ const filterest = {
         }
       }
 
+      let elementsToSend = [];
+      let htmlElementsToSent = [];
+
       parentNodesToCheck.forEach(e => {
         const childs = [].slice.call(e.children);
         childs.forEach(child => {
-          child.classList.add('filterest-background');
+          // child.classList.add('filterest-background');
+
+          elementsToSend.push({ selector: filterest.getSelector(child), innerText: child.innerText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim() });
+          htmlElementsToSent.push(child);
         });
-        //e.classList.add('filterest-background');
-        //console.log(e.children);
-      })
+      });
 
-      // filterest.updateElementsList();
+      const requestOptions = {
+        method: 'POST',
+        headers: { 
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ elements: elementsToSend, keywords: filterest.keywords 
+        })
+      };
+      
+      fetch("https://localhost:44340/keywordfinder/similarElements", requestOptions)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
 
-      // let hideButton = document.querySelector("#hideSimilarElements");
-      // hideButton.classList.remove("filterest-hidden");
-      // let confirmButton = document.querySelector("#confirmKeywords");
-      // confirmButton.classList.add("filterest-hidden");
+            data.forEach(elementSelector => {
+              htmlElementsToSent.find(e => filterest.getSelector(e) === elementSelector).classList.add('filterest-background');
+            });
+          });
     });
 
     document.body.appendChild(div);
