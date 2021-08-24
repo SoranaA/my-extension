@@ -7,6 +7,7 @@ const filterest = {
   isActive: false,
   hiddenElements: [],
   keywords: [],
+  suggestedElements: [],
   helpWindow: false,
 
   isChildOfHelpWindow: function (e) {
@@ -350,7 +351,14 @@ const filterest = {
       <br/>
       <div>
         <button id="hideSimilarElements">Hide similar elements</button>
-        <button id="confirmKeywords" class="filterest-hidden">Confirm keywords</button>
+        <div id="keywordsButtons" class="filterest-hidden">
+          <button id="confirmKeywords">Confirm keywords</button>
+        </div>
+        <div id="confirmHide" class="filterest-hidden">
+          <p style="color: red;">Do you want to hide suggested elements?</p>
+          <button id="filterestNo" class="filterest-right">No</button>
+          <button id="filterestYes" class="filterest-right" style="margin-right: 45px;">Yes</button>
+        </div>
       </div>
     `;
 
@@ -373,7 +381,9 @@ const filterest = {
 
       let hideButton = document.querySelector("#hideSimilarElements");
       hideButton.classList.add("filterest-hidden");
-      let confirmButton = document.querySelector("#confirmKeywords");
+      let confirmHideButton = document.querySelector('#confirmHide');
+      confirmHideButton.classList.add('filterest-hidden');
+      let confirmButton = document.querySelector("#keywordsButtons");
       confirmButton.classList.remove("filterest-hidden");
     });
 
@@ -416,8 +426,6 @@ const filterest = {
       parentNodesToCheck.forEach(e => {
         const childs = [].slice.call(e.children);
         childs.forEach(child => {
-          // child.classList.add('filterest-background');
-
           elementsToSend.push({ selector: filterest.getSelector(child), innerText: child.innerText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim() });
           htmlElementsToSent.push(child);
         });
@@ -436,11 +444,26 @@ const filterest = {
       fetch("https://localhost:44340/keywordfinder/similarElements", requestOptions)
           .then(response => response.json())
           .then(data => {
-            console.log(data);
-
             data.forEach(elementSelector => {
-              htmlElementsToSent.find(e => filterest.getSelector(e) === elementSelector).classList.add('filterest-background');
+              var suggestedElement = htmlElementsToSent.find(e => filterest.getSelector(e) === elementSelector);
+              
+              if(!suggestedElement.classList.contains('filterest-hidden')){
+                suggestedElement.classList.add('filterest-background');
+                filterest.suggestedElements.push(suggestedElement);
+              }
             });
+
+            if(filterest.suggestedElements.length > 0) {
+              let hideButton = document.querySelector("#hideSimilarElements");
+              hideButton.classList.add("filterest-hidden");
+              let confirmHideButton = document.querySelector('#confirmHide');
+              confirmHideButton.classList.remove('filterest-hidden');
+              let confirmButton = document.querySelector("#keywordsButtons");
+              confirmButton.classList.add("filterest-hidden");  
+            }
+            else {
+              alert('No similar elements were found based on the current keywords');
+            }
           });
     });
 

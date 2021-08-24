@@ -4,17 +4,32 @@ namespace backend_text_similarities.Helpers
 {
     public class KeywordAnalyzer
     {
-        private static readonly string[] ignoredCharacters = new string[] 
-        { 
-            ",", ".", "?", "!", ";", ":", "'", "\"", "(", ")", "[", "]", "-" 
+        private static readonly string[] ignoredCharacters = new string[]
+        {
+            ",", ".", "?", "!", ";", ":", "'", "\"", "(", ")", "[", "]", "-"
         };
 
-        public static KeywordAnalysis Analyze(string content)
+        public static string ReplaceSpecialCharacters(string content)
         {
             foreach (var c in ignoredCharacters)
             {
                 content = content.Replace(c, string.Empty);
             }
+
+            content = content.Replace('ă', 'a');
+            content = content.Replace('â', 'a');
+            content = content.Replace('î', 'i');
+            content = content.Replace('ș', 's');
+            content = content.Replace('ş', 's');
+            content = content.Replace('ț', 't');
+            content = content.Replace('ţ', 't');
+
+            return content;
+        }
+
+        public static KeywordAnalysis Analyze(string content)
+        {
+            content = ReplaceSpecialCharacters(content);
 
             KeywordAnalysis analysis = new KeywordAnalysis { Content = content };
             int wordCount = 0;

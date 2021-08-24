@@ -47,7 +47,9 @@ namespace backend_text_similarities.Controllers
 
                 foreach (var keyword in elementsList.Keywords)
                 {
-                    if (element.InnerText.Contains(keyword))
+                    var content = KeywordAnalyzer.ReplaceSpecialCharacters(element.InnerText);
+
+                    if (content.Contains(keyword))
                     {
                         keywordsContained++;
                     }

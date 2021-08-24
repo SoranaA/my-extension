@@ -69,6 +69,12 @@
   background-color: #de8a8a !important;
 }
 
+.filterest-right {
+  float: right;
+  margin-left: 10px;
+  margin-top: -35px;
+}
+
 /*==================================================================
 Elements Table
 */
