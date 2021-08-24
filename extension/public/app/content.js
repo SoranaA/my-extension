@@ -454,17 +454,57 @@ const filterest = {
             });
 
             if(filterest.suggestedElements.length > 0) {
-              let hideButton = document.querySelector("#hideSimilarElements");
-              hideButton.classList.add("filterest-hidden");
               let confirmHideButton = document.querySelector('#confirmHide');
               confirmHideButton.classList.remove('filterest-hidden');
-              let confirmButton = document.querySelector("#keywordsButtons");
-              confirmButton.classList.add("filterest-hidden");  
+              let hideButton = document.querySelector("#hideSimilarElements");
+              hideButton.classList.add("filterest-hidden");  
             }
             else {
               alert('No similar elements were found based on the current keywords');
+              let confirmHideButton = document.querySelector('#confirmHide');
+              confirmHideButton.classList.add('filterest-hidden');
+              let hideButton = document.querySelector("#hideSimilarElements");
+              hideButton.classList.remove("filterest-hidden");
+              filterest.updateElementsList();
             }
+            
+            let confirmButton = document.querySelector("#keywordsButtons");
+            confirmButton.classList.add("filterest-hidden");
           });
+    });
+
+    div.querySelector('#filterestYes').addEventListener("click", function (e) {
+      e.preventDefault();
+
+      filterest.suggestedElements.forEach(element => {
+        element.classList.remove("filterest-background");
+        element.classList.add("filterest-hidden");
+        filterest.hiddenElements.push(element);
+      });
+
+      filterest.suggestedElements = [];
+      filterest.updateElementsList();
+
+      let confirmHideButton = document.querySelector('#confirmHide');
+      confirmHideButton.classList.add('filterest-hidden');
+      let hideButton = document.querySelector("#hideSimilarElements");
+      hideButton.classList.remove("filterest-hidden");
+    });
+
+    div.querySelector('#filterestNo').addEventListener("click", function (e) {
+      e.preventDefault();
+
+      filterest.suggestedElements.forEach(element => {
+        element.classList.remove("filterest-background");
+      });
+
+      filterest.suggestedElements = [];
+      filterest.updateElementsList();
+
+      let confirmHideButton = document.querySelector('#confirmHide');
+      confirmHideButton.classList.add('filterest-hidden');
+      let hideButton = document.querySelector("#hideSimilarElements");
+      hideButton.classList.remove("filterest-hidden");
     });
 
     document.body.appendChild(div);
