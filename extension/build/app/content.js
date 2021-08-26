@@ -353,6 +353,7 @@ const filterest = {
         <button id="hideSimilarElements">Hide similar elements</button>
         <div id="keywordsButtons" class="filterest-hidden">
           <button id="confirmKeywords">Confirm keywords</button>
+          <button id="addKeyword" style="float: right;">Add Keyword</button>
         </div>
         <div id="confirmHide" class="filterest-hidden">
           <p style="color: red;">Do you want to hide suggested elements?</p>
@@ -385,6 +386,13 @@ const filterest = {
       confirmHideButton.classList.add('filterest-hidden');
       let confirmButton = document.querySelector("#keywordsButtons");
       confirmButton.classList.remove("filterest-hidden");
+    });
+
+    div.querySelector('#addKeyword').addEventListener("click", function(e) {
+      e.preventDefault();
+
+      filterest.keywords.push('');
+      filterest.displayKeywords();
     });
 
     div.querySelector('#confirmKeywords').addEventListener("click", async function (e) {
