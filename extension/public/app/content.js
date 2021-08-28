@@ -97,10 +97,13 @@ const filterest = {
 
   getElementDisplayForTable: function (e) {
     if (e.innerText) {
-      if (e.innerText.length > 100)
-        return e.innerText.substring(0, 100) + "...";
-      return e.innerText;
+      const text = e.innerText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim();
+
+      if (text.length > 50)
+        return text.substring(0, 100) + "...";
+      return text;
     }
+    
     return e;
   },
 
@@ -110,57 +113,74 @@ const filterest = {
     let elemList = document.querySelector("#elements_list");
     let keywordsHtml = [];
 
-    if(filterest.keywords.length) {
-      keywordsHtml.push(
-        `<table><tr><th>Keyword</th><th></th></tr>`
-      );
+    keywordsHtml.push(
+      `<table><tr><th>Keyword</th><th></th></tr>`
+    );
 
+    if(filterest.keywords.length) {
       filterest.keywords.forEach((keyword) => {
         keywordsHtml.push(`<tr>
-        <td><input type="text" id="keyword_${keyword}" name="keywordInput" value="${keyword}"></td>
+        <td><input type="text" id="keyword_${keyword}" class="filterest-keywordInput" value="${keyword}"></td>
         <td align="right"><button 
           title="Remove"
           id="removeKeyword_${keyword}"
-          class="filterest_removeKeyword">x</button></td>
+          class="filterest_removeKeyword filterest-button">x</button></td>
       </tr>`)
       });
-
-      keywordsHtml.push("</table>");
+    } else {
+      keywordsHtml.push(`<tr>
+          <td colspan="2" style="padding: 35px;">No keywords found. You can add some keywords.</td>          
+        </tr>`);
     }
+
+    keywordsHtml.push("</table>");
 
     elemList.innerHTML = keywordsHtml.join("\n");
 
-    let i = -1;
-    for (let tr of document.querySelectorAll("#elements_list table tr")) {
-      if (i < 0) {
-        // skip heading
-        i++;
-        continue;
-      }
-
-      function onDeleteKeyword(e) {
-        const keyword = e.target.id.split("_")[1];
-        let index = filterest.keywords.findIndex(
-          (element) => element === keyword
-        );
-
-        if (index > -1) {
-          filterest.keywords.splice(index, 1);
+    if(filterest.keywords.length) {
+      let i = -1;
+      for (let tr of document.querySelectorAll("#elements_list table tr")) {
+        if (i < 0) {
+          // skip heading
+          i++;
+          continue;
         }
 
-        filterest.displayKeywords();
+        function onDeleteKeyword(e) {
+          const keyword = e.target.id.split("_")[1];
+          let index = filterest.keywords.findIndex(
+            (element) => element === keyword
+          );
 
-        e.preventDefault();
-        e.stopPropagation();
+          if (index > -1) {
+            filterest.keywords.splice(index, 1);
+          }
+
+          filterest.displayKeywords();
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        function onBlurKeywordInput(e) {
+          filterest.updateKeywords();
+
+          const keywords = filterest.keywords.filter((a) => a);
+          filterest.keywords = keywords;
+
+          filterest.displayKeywords();
+        }
+
+        tr.querySelector(".filterest_removeKeyword").addEventListener(
+          "click",
+          onDeleteKeyword,
+          false
+        );
+
+        tr.querySelector(".filterest-keywordInput").addEventListener("blur", onBlurKeywordInput);
+
+        i++;
       }
-
-      tr.querySelector(".filterest_removeKeyword").addEventListener(
-        "click",
-        onDeleteKeyword,
-        false
-      );
-
-      i++;
     }
   },
 
@@ -169,12 +189,12 @@ const filterest = {
 
     let elemList = document.querySelector("#elements_list");
     let elementsHtml = [];
+      
+    elementsHtml.push(
+      `<table><tr><th>Removed element</th><th>Remember</th><th></th></tr>`
+    );
 
     if (filterest.hiddenElements.length) {
-      elementsHtml.push(
-        `<table><tr><th>Removed element</th><th>Remember</th><th></th></tr>`
-      );
-
       filterest.hiddenElements.forEach((element) => {
         elementsHtml.push(`<tr>
           <td>${filterest.getElementDisplayForTable(element)}</td>
@@ -184,12 +204,16 @@ const filterest = {
           <td><button 
             title="Restore"
             id="${filterest.getSelector(element)}"
-            class="filterest_restore">↺</button></td>
+            class="filterest-button filterest_restore">↺</button></td>
         </tr>`);
       });
-
-      elementsHtml.push("</table>");
+    } else {
+      elementsHtml.push(`<tr>
+          <td colspan="3" style="padding: 35px;">No elements hidden yet. Click on the elements you want to hide.</td>          
+        </tr>`);
     }
+
+    elementsHtml.push("</table>");
 
     elemList.innerHTML = elementsHtml.join("\n");
 
@@ -350,15 +374,15 @@ const filterest = {
       <div id="elements_list" class="table100 ver1"></div>
       <br/>
       <div>
-        <button id="hideSimilarElements">Hide similar elements</button>
+        <button id="hideSimilarElements" class="filterest-button">Hide similar elements</button>
         <div id="keywordsButtons" class="filterest-hidden">
-          <button id="confirmKeywords">Confirm keywords</button>
-          <button id="addKeyword" style="float: right;">Add Keyword</button>
+          <button id="confirmKeywords" class="filterest-button">Confirm keywords</button>
+          <button id="addKeyword" class="filterest-button" style="float: right;">Add Keyword</button>
         </div>
         <div id="confirmHide" class="filterest-hidden">
           <p style="color: red;">Do you want to hide suggested elements?</p>
-          <button id="filterestNo" class="filterest-right">No</button>
-          <button id="filterestYes" class="filterest-right" style="margin-right: 45px;">Yes</button>
+          <button id="filterestNo" class="filterest-button filterest-right">No</button>
+          <button id="filterestYes" class="filterest-button filterest-right" style="margin-right: 45px;">Yes</button>
         </div>
       </div>
     `;
@@ -393,12 +417,14 @@ const filterest = {
 
       filterest.keywords.push('');
       filterest.displayKeywords();
+
+      document.getElementById("keyword_").focus();      
     });
 
     div.querySelector('#confirmKeywords').addEventListener("click", async function (e) {
       e.preventDefault();
 
-      await filterest.updateKeywords();
+      filterest.updateKeywords();
 
       const parentNodesToCheck = [];
 
