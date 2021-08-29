@@ -19,7 +19,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["app/content.js"],
+      "js": ["app/content.js", "app/selector.js", "app/hideSimilarElements.js"],
       "css": ["app/style.css"],
       "run_at": "document_end",
       "all_frames": false

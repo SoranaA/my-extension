@@ -19,21 +19,34 @@ const filterest = {
     return false;
   },
 
-  getSelector: function (element) {
-    if (element.tagName === "BODY") return "body";
-    if (element.tagName === "HTML") return "html";
-    if (!element) return null;
+  getSelector: function(element) {
+		if (element.tagName == 'BODY') return 'body';
+		if (element.tagName == 'HTML') return 'html';
+		if (!element) return null;
 
-    // https://stackoverflow.com/a/49663134
-    let path = [], parent;
+		return cssFinder(element, {
+			seedMinLength: 3,
+			optimizedMinLength: 1,
+		});
+	},
+
+  // getSelector: function (element) {
+  //   console.log(window.location);
+
+  //   if (element.tagName === "BODY") return "body";
+  //   if (element.tagName === "HTML") return "html";
+  //   if (!element) return null;
+
+  //   // https://stackoverflow.com/a/49663134
+  //   let path = [], parent;
     
-    while (parent = element.parentNode) {
-      path.unshift(`${element.tagName}:nth-child(${[].indexOf.call(parent.children, element)+1})`);
-      element = parent;
-    }
+  //   while (parent = element.parentNode) {
+  //     path.unshift(`${element.tagName}:nth-child(${[].indexOf.call(parent.children, element)+1})`);
+  //     element = parent;
+  //   }
 
-    return `${path.join(' > ')}`.toLowerCase();
-  },
+  //   return `${path.join(' > ')}`.toLowerCase();
+  // },
 
   ignoreElement: function (e) {
     return (
@@ -217,53 +230,55 @@ const filterest = {
 
     elemList.innerHTML = elementsHtml.join("\n");
 
-    let i = -1;
-    for (let tr of document.querySelectorAll("#elements_list table tr")) {
-      if (i < 0) {
-        // skip heading
-        i++;
-        continue;
-      }
-
-      function onRestoreElement(e) {
-        let index = filterest.hiddenElements.findIndex(
-          (element) => filterest.getSelector(element) === e.target.id
-        );
-
-        if (index > -1) {
-          filterest.hiddenElements[index].classList.remove("filterest-hidden");
-          filterest.hiddenElements.splice(index, 1);
+    if (filterest.hiddenElements.length) {
+      let i = -1;
+      for (let tr of document.querySelectorAll("#elements_list table tr")) {
+        if (i < 0) {
+          // skip heading
+          i++;
+          continue;
         }
 
-        filterest.updateElementsList();
-        filterest.updateSavedElements();
+        function onRestoreElement(e) {
+          let index = filterest.hiddenElements.findIndex(
+            (element) => filterest.getSelector(element) === e.target.id
+          );
 
-        e.preventDefault();
-        e.stopPropagation();
-      }
+          if (index > -1) {
+            filterest.hiddenElements[index].classList.remove("filterest-hidden");
+            filterest.hiddenElements.splice(index, 1);
+          }
 
-      function onChangeRememberOption(e) {
-        let index = filterest.hiddenElements.findIndex(
-          (element) => filterest.getSelector(element) === e.target.id
+          filterest.updateElementsList();
+          filterest.updateSavedElements();
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        function onChangeRememberOption(e) {
+          let index = filterest.hiddenElements.findIndex(
+            (element) => filterest.getSelector(element) === e.target.id
+          );
+
+          filterest.hiddenElements[index].rememberHide = this.checked;
+
+          filterest.updateSavedElements();
+        }
+
+        tr.querySelector(".filterest_restore").addEventListener(
+          "click",
+          onRestoreElement,
+          false
+        );
+        tr.querySelector("input").addEventListener(
+          "change",
+          onChangeRememberOption,
+          false
         );
 
-        filterest.hiddenElements[index].rememberHide = this.checked;
-
-        filterest.updateSavedElements();
+        i++;
       }
-
-      tr.querySelector(".filterest_restore").addEventListener(
-        "click",
-        onRestoreElement,
-        false
-      );
-      tr.querySelector("input").addEventListener(
-        "change",
-        onChangeRememberOption,
-        false
-      );
-
-      i++;
     }
   },
 
@@ -421,91 +436,7 @@ const filterest = {
       document.getElementById("keyword_").focus();      
     });
 
-    div.querySelector('#confirmKeywords').addEventListener("click", async function (e) {
-      e.preventDefault();
-
-      filterest.updateKeywords();
-
-      const parentNodesToCheck = [];
-
-      filterest.hiddenElements.forEach(element => {
-        if (!parentNodesToCheck.find(elem => filterest.getSelector(element.parentNode) === filterest.getSelector(elem))) {
-          parentNodesToCheck.push(element.parentNode);
-        }
-      });
-
-      let searchParents = true;
-      while(searchParents) {
-        let elementsWithOneChild = parentNodesToCheck.filter(element => element.children.length <= 1);
-        
-        if(elementsWithOneChild.length > 0) {
-          elementsWithOneChild.forEach(e => {
-            let index = parentNodesToCheck.findIndex(
-              (element) => filterest.getSelector(element) === filterest.getSelector(e)
-            );
-    
-            parentNodesToCheck.splice(index, 1);
-            if (!parentNodesToCheck.find(elem => filterest.getSelector(e.parentNode) === filterest.getSelector(elem))) {
-              parentNodesToCheck.push(e.parentNode);
-            }
-          })
-        } else {
-          searchParents = false;
-        }
-      }
-
-      let elementsToSend = [];
-      let htmlElementsToSent = [];
-
-      parentNodesToCheck.forEach(e => {
-        const childs = [].slice.call(e.children);
-        childs.forEach(child => {
-          elementsToSend.push({ selector: filterest.getSelector(child), innerText: child.innerText.replace(/\n/g, '').replace(/ +(?= )/g,'').trim() });
-          htmlElementsToSent.push(child);
-        });
-      });
-
-      const requestOptions = {
-        method: 'POST',
-        headers: { 
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ elements: elementsToSend, keywords: filterest.keywords 
-        })
-      };
-      
-      fetch("https://localhost:44340/keywordfinder/similarElements", requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            data.forEach(elementSelector => {
-              var suggestedElement = htmlElementsToSent.find(e => filterest.getSelector(e) === elementSelector);
-              
-              if(!suggestedElement.classList.contains('filterest-hidden')){
-                suggestedElement.classList.add('filterest-background');
-                filterest.suggestedElements.push(suggestedElement);
-              }
-            });
-
-            if(filterest.suggestedElements.length > 0) {
-              let confirmHideButton = document.querySelector('#confirmHide');
-              confirmHideButton.classList.remove('filterest-hidden');
-              let hideButton = document.querySelector("#hideSimilarElements");
-              hideButton.classList.add("filterest-hidden");  
-            }
-            else {
-              alert('No similar elements were found based on the current keywords');
-              let confirmHideButton = document.querySelector('#confirmHide');
-              confirmHideButton.classList.add('filterest-hidden');
-              let hideButton = document.querySelector("#hideSimilarElements");
-              hideButton.classList.remove("filterest-hidden");
-              filterest.updateElementsList();
-            }
-            
-            let confirmButton = document.querySelector("#keywordsButtons");
-            confirmButton.classList.add("filterest-hidden");
-          });
-    });
+    div.querySelector('#confirmKeywords').addEventListener("click", confirmKeywords);
 
     div.querySelector('#filterestYes').addEventListener("click", function (e) {
       e.preventDefault();

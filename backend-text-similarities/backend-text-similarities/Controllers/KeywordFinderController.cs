@@ -55,7 +55,7 @@ namespace backend_text_similarities.Controllers
                     }
                 }
 
-                if (keywordsContained >= 2)
+                if (keywordsContained >= 1)
                 {
                     selectors.Add(element.Selector);
                 }

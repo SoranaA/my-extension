@@ -17,14 +17,17 @@ namespace backend_text_similarities.Helpers
             }
 
             content = content.Replace('ă', 'a');
+            content = content.Replace('ă', 'a');
             content = content.Replace('â', 'a');
+            content = content.Replace('â', 'a');
+            content = content.Replace('î', 'i');
             content = content.Replace('î', 'i');
             content = content.Replace('ș', 's');
             content = content.Replace('ş', 's');
             content = content.Replace('ț', 't');
             content = content.Replace('ţ', 't');
 
-            return content;
+            return content.ToLower();
         }
 
         public static KeywordAnalysis Analyze(string content)
